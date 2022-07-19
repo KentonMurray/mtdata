@@ -366,6 +366,11 @@ print(*tag)  # tag is a tuple
 print(f"{tag}")  # str(tag) gets standardized string
 ```
 
+## Dataset Checksums:
+One issue with replicability of experiments in MT systems is that datasets may be different or underspecified across systems. Furthermore, preprocessing steps such as tokenization/cleaning/truecasing/etc. can vastly change how well a model works. The [`hash_generator`](mtdata/hash_generator.py) script will take a file as an input and generate a unique hash. Additionally, this is now run as well when datasets are created and is reported in mtdata.signature.txt. This allows a user to verify that the signature of a dataset is creating the same file as expected - and to check with posted checksums.
+
+Of further interest, this is quick to run and can be reported across various steps of preprocessing - including on binarized files such as those that fairseq and other toolkits generate. Ideally, researchers will also report hashes after all preprocessing is complete in order to allow replicability studies and experiments.
+
 ## How to Contribute:
 * Please help grow the datasets by adding any missing and new datasets to [`index`](mtdata/index/__init__.py) module.
 * Please create issues and/or pull requests at https://github.com/thammegowda/mtdata/ 

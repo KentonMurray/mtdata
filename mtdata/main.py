@@ -5,11 +5,13 @@
 import argparse
 from pathlib import Path
 from collections import defaultdict
+import os
 
 import mtdata
 from mtdata import log, __version__, cache_dir as CACHE_DIR, cached_index_file
 from mtdata.entry import DatasetId, lang_pair
 from mtdata.utils import IO
+from mtdata.hash_generator import get_hash
 
 DEF_N_JOBS = 1
 
@@ -49,6 +51,21 @@ def get_data(langs, out_dir, train_dids=None, test_dids=None, dev_dids=None, mer
     log.info(f'mtdata args for reproducing this dataset:\n {sig}')
     with IO.writer(out_dir / 'mtdata.signature.txt', append=True) as w:
         w.write(sig)
+
+    # Write out hashes
+    hashes = ""
+    allfiles = os.listdir(dataset.dir) # Note that we may have more than we want here...
+    for dfile in allfiles:
+        if dfile == "mtdata.signature.txt":
+            continue # Skip the file we are writing to
+        joined = os.path.join(dataset.dir, dfile)
+        if os.path.isdir(joined):
+            continue # Skip directories
+        hashed = get_hash(joined)
+        hashes = hashes + "\n" + dfile + ":" + hashed
+    hashes = hashes + "\n"
+    with IO.writer(out_dir / 'mtdata.signature.txt', append=True) as w:
+        w.write(hashes)
 
 
 def generate_report(langs, names, not_names=None, format='plain'):
